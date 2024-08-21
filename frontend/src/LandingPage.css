@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #1a111f; /* Dark purple background */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .landing-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  
+  .logo {
+    font-size: 16px;
+    font-weight: bold;
+    color: #FFFFFF; /* White color for the logo text */
+  }
+  
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .welcome-text {
+    font-size: 36px; /* Adjusted to match the size in the design */
+    font-weight: bold;
+    margin-bottom: 60px; /* Adjusted to match the spacing in the design */
+    color: #FFFFFF; /* White color for the welcome text */
+  }
+  
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .btn {
+    padding: 15px 30px; /* Adjusted padding to match the button size */
+    font-size: 18px; /* Adjusted font size */
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    background-color: #4CAF50; /* Green color for buttons */
+    text-align: center;
+    width: 200px; /* Fixed width to match the design */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  .signup-btn {
+    background-color: #4CAF50; /* Green color */
+  }
+  
+  .login-btn {
+    background-color: #4CAF50; /* Same green color for consistency */
+  }
+  
+  .btn:hover {
+    background-color: #45A049; /* Darker green on hover */
+  }

@@ -1,0 +1,94 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #1a111f; /* Dark purple background */
+    color: white;
+  }
+  
+  .register-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 50px;
+  }
+  
+  .header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+  
+  .logo {
+    font-size: 16px;
+    font-weight: bold;
+    color: #FFFFFF; /* White color for the logo text */
+  }
+  
+  .register-main {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  .register-title {
+    font-size: 36px;
+    margin-bottom: 40px;
+  }
+  
+  .register-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .input-field {
+    padding: 10px 0;
+    margin-bottom: 20px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #FFFFFF;
+    color: white;
+    font-size: 16px;
+  }
+  
+  .input-field::placeholder {
+    color: white;
+    opacity: 0.7;
+  }
+  
+  .create-account-btn {
+    padding: 15px 30px;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background-color: #4CAF50; /* Green color for the button */
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .continue-with-text {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 16px;
+    opacity: 0.8;
+  }
+  
+  .google-signin-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .google-logo {
+    width: 50px; /* You can adjust this based on your design */
+    height: 50px;
+  }
