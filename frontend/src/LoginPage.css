@@ -93,3 +93,9 @@ body {
     width: 50px; /* You can adjust this based on your design */
     height: 50px;
 }
+
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
