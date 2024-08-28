@@ -1,0 +1,4 @@
+.env
+firebase.js
+frontend/node_modules/*
+temp.js
