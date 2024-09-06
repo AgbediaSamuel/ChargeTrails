@@ -6,3 +6,4 @@ frontend/node_modules/*
 backend/config/*
 **/__pycache__/*
 config/*
+trails/*

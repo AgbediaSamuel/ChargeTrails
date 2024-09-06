@@ -15,9 +15,8 @@ def encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
 
-
-@app.get("/receipt")
-def get_receipt_text(b64_image):
+# Function to get the text from the receipt
+def get_receipt_text(b64_image, user_id):
     headers = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {api_key}"
@@ -31,7 +30,7 @@ def get_receipt_text(b64_image):
         "content": [
             {
             "type": "text",
-            "text": "You have been provided a receipt. Your response should return a dictionary with the following details for each product {Name, Category, Quantity, Price}. Additionally, provide the total amount, shop name, location, and date of purchase as metadata. Don't include json or any other comments in your response."
+            "text": "You have been provided a receipt. Your response should return a dictionary with the following details for each product {Name, Category, Quantity, Price}. Additionally, provide {total amount, shop name, location, and date of purchase} as metadata. Don't include json or any other comments in your response."
             },
             {
             "type": "image_url",
@@ -47,4 +46,9 @@ def get_receipt_text(b64_image):
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload).json()
     result = response['choices'][0]['message']['content']
-    return {'result' : result}
+    return result, user_id
+
+if __name__ == "__main__":
+    b64_image = encode_image("receipt_testing.jpeg")
+    result = get_receipt_text(b64_image)
+    print(result)
