@@ -50,7 +50,7 @@ Given Minerva University’s model of students visiting different rotation citie
 
 ## Technologies
 - **Frontend**: React, HTML, CSS, JavaScript
-- **Backend**: Python, FastAPI
+- **Backend**: Python, FastAPI, OpenAI API
 - **Authentication**: Firebase
 - **Database**: DynamoDB, GraphQL
 
