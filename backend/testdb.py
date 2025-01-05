@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-URL_DATABASE = os.getenv("URL_DATABASE")
+# URL_DATABASE = os.getenv("URL_DATABASE")
+URL_DATABASE = "sqlite:///./receipts.db"
+print(URL_DATABASE)
 
 engine = create_engine(URL_DATABASE)
 sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

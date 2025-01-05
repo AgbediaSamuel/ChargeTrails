@@ -1,16 +1,19 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from testdb import Base
 
+
 class Product(Base):
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
     product_name = Column(String(50))
     category_id = Column(Integer, ForeignKey('categories.id'))
 
+
 class Category(Base):
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True)
     category_name = Column(String(50))
+
 
 class Users(Base):
     __tablename__ = 'users'
@@ -19,6 +22,8 @@ class Users(Base):
     password = Column(String(50))
     email = Column(String(50))
     created_at = Column(String(50))
+    language = Column(String(50))
+
 
 class Receipt(Base):
     __tablename__ = 'receipts'
@@ -29,6 +34,7 @@ class Receipt(Base):
     location_id = Column(Integer, ForeignKey('locations.id'))
     created_at = Column(String(50))
 
+
 class Location(Base):
     __tablename__ = 'locations'
     id = Column(Integer, primary_key=True)
@@ -36,6 +42,7 @@ class Location(Base):
     address = Column(String(50))
     city = Column(String(50))
     state = Column(String(50))
+
 
 class ProductReceipt(Base):
     __tablename__ = 'product_receipt'

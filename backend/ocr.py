@@ -2,7 +2,6 @@ import base64
 import requests
 import os
 import uvicorn
-import cv2
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -81,8 +80,8 @@ def get_receipt_text(b64_image):
     except KeyError:
         return {"error": "Unexpected response format from OpenAI API"}
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+#if __name__ == "__main__":
+#    uvicorn.run(app, host="localhost", port=8000)
 #     b64_image = encode_image("receipt_testing.jpeg")
 #     result = get_receipt_text(b64_image)
 #     print(result)
