@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+// import { auth } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import '../Register.css'; 
 import GoogleLogo from '../assets/images/GoogleLogo.png';
+
+const auth = getAuth();
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');

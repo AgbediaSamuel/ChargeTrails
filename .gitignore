@@ -1,4 +1,5 @@
 .env
+**/.env
 firebase.js
 frontend/node_modules/*
 temp.js
@@ -7,3 +8,4 @@ backend/config/*
 **/__pycache__/*
 config/*
 trails/*
+chargeTrails/*

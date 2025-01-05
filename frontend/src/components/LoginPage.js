@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+// import { auth } from 'firebase';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import '../LoginPage.css';
 import GoogleLogo from '../assets/images/GoogleLogo.png';
+
+const auth = getAuth();
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
