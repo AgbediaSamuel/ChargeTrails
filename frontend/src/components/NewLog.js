@@ -1,68 +1,100 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import '../NewLog.css';
+import { useAuth } from '../context/AuthContext';
+import { getIdToken } from 'firebase/auth';
 
 const NewLog = () => {
-    const fileInputRef = useRef(null);
-    const [uploadResult, setUploadResult] = useState("");
+    const { currentUser } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const [receiptData, setReceiptData] = useState(null);
+    const [error, setError] = useState(null);
+
+    const handleCameraClick = () => {
+        // Camera functionality would go here
+        console.log('Camera clicked');
+    };
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file || !currentUser) return;
 
-        const formData = new FormData();
-        formData.append("file", file);
-
+        setIsLoading(true);
+        setError(null);
+        
         try {
+            const formData = new FormData();
+            formData.append("file", file);
+            
+            // Get the user's ID token
+            const token = await getIdToken(currentUser, true);
+            
             const response = await fetch("http://localhost:8000/encode_image", {
                 method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                },
                 body: formData,
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                setUploadResult(data.receipt_details || "Upload successful!");
-            } else {
-                setUploadResult("Error uploading file");
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Unknown error occurred');
             }
+            
+            const data = await response.json();
+            setReceiptData(data);
+            console.log('Receipt data:', data);
         } catch (error) {
-            console.error("Error connecting to server:", error);
-            setUploadResult("Error connecting to server");
+            console.error('Upload error:', error);
+            setError(error.message || 'Error uploading file');
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const triggerFileUpload = () => {
-        fileInputRef.current.click();
-    };
-
     return (
-        <div>
+        <div className="newlog-container">
             <header className="header">
                 <h1 className="logo">CHARGETRAILS</h1>
-                <div className="header-icons">
-                    <button className="settings-icon">
-                        <i className="fa-solid fa-gear"></i>
-                    </button>
-                </div>
             </header>
+            
             <div className="button-container">
-                {/* Camera Button (UI only for now) */}
-                <button id="camera-button" className="camera-button">
+                <button className="camera-button" onClick={handleCameraClick}>
                     <i className="fa-solid fa-camera"></i>
                 </button>
-
-                {/* Attachment Button */}
-                <button id="attachment-button" className='attachment-button' onClick={triggerFileUpload}>
+                <label className="attachment-button">
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        style={{ display: 'none' }} 
+                        onChange={handleFileUpload}
+                    />
                     <i className="fa-solid fa-paperclip"></i>
-                </button>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileUpload}
-                    accept="image/*"
-                />
+                </label>
             </div>
-            {uploadResult && <div className="upload-result">{uploadResult}</div>}
+            
+            {isLoading && <div className="loading">Processing receipt...</div>}
+            
+            {error && <div className="error">{error}</div>}
+            
+            {receiptData && !isLoading && (
+                <div className="receipt-data">
+                    <h2>Receipt Information</h2>
+                    <p><strong>Store:</strong> {receiptData.receipt_data?.metadata?.['shop name'] || 'Unknown'}</p>
+                    <p><strong>Date:</strong> {receiptData.receipt_data?.metadata?.['date of purchase'] || 'Unknown'}</p>
+                    <p><strong>Total:</strong> ${receiptData.receipt_data?.metadata?.['total amount'] || '0.00'}</p>
+                    
+                    <h3>Products</h3>
+                    <ul className="product-list">
+                        {receiptData.receipt_data?.products?.map((product, index) => (
+                            <li key={index} className="product-item">
+                                <span>{product.Name}</span>
+                                <span>${product.Price}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 };

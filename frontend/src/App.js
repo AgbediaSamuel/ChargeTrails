@@ -5,20 +5,31 @@ import RegisterPage from './components/RegisterPage';
 import LoginPage from './components/LoginPage';
 import DashboardPage from './components/Dashboard';
 import NewLog from './components/NewLog';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import './App.css';
-
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/Register" element={<RegisterPage />} />
-                <Route path="/Login" element={<LoginPage />} />
-                <Route path="/Dashboard" element={<DashboardPage />} />
-                <Route path="/NewLog" element={<NewLog />} />
-            </Routes>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/Register" element={<RegisterPage />} />
+                    <Route path="/Login" element={<LoginPage />} />
+                    <Route path="/Dashboard" element={
+                        <ProtectedRoute>
+                            <DashboardPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/NewLog" element={
+                        <ProtectedRoute>
+                            <NewLog />
+                        </ProtectedRoute>
+                    } />
+                </Routes>
+            </Router>
+        </AuthProvider>
     );
 }
 

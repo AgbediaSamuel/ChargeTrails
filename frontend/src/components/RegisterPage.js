@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { auth } from 'firebase/auth';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import '../Register.css'; 
 import GoogleLogo from '../assets/images/GoogleLogo.png';
-
-const auth = getAuth();
+import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -14,12 +12,35 @@ const RegisterPage = () => {
     const [lastName, setLastName] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const auth = getAuth();
+    const { currentUser } = useAuth();
+
+    // Move the navigation logic to useEffect
+    useEffect(() => {
+        // Redirect if user is already logged in
+        if (currentUser) {
+            navigate('/Dashboard');
+        }
+    }, [currentUser, navigate]); // Add dependencies
 
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
+            setError(null);
             await createUserWithEmailAndPassword(auth, email, password);
-            navigate('/dashboard');
+            // User is automatically signed in after registration
+            navigate('/Dashboard');
+        } catch (error) {
+            setError(error.message);
+            console.error(error);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            navigate('/Dashboard');
         } catch (error) {
             setError(error.message);
             console.error(error);
@@ -70,7 +91,7 @@ const RegisterPage = () => {
                 </form>
                 {error && <p className="error-message">{error}</p>}
                 <p className="continue-with-text">or continue with</p>
-                <button className="google-signin-btn">
+                <button className="google-signin-btn" onClick={handleGoogleSignIn}>
                     <img src={GoogleLogo} alt="Google Sign-In" className="google-logo" />
                 </button>
             </main>

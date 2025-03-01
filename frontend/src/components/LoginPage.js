@@ -1,25 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import { auth } from 'firebase';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import '../LoginPage.css';
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import '../LoginPage.css'; 
 import GoogleLogo from '../assets/images/GoogleLogo.png';
-
-const auth = getAuth();
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const auth = getAuth();
+    const { currentUser } = useAuth();
+
+    // Move the navigation logic to useEffect
+    useEffect(() => {
+        // Redirect if user is already logged in
+        if (currentUser) {
+            navigate('/Dashboard');
+        }
+    }, [currentUser, navigate]); // Add dependencies
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
- 
+            setError(null);
             await signInWithEmailAndPassword(auth, email, password);
+            navigate('/Dashboard');
+        } catch (error) {
+            setError(error.message);
+            console.error(error);
+        }
+    };
 
-            navigate('/dashboard');
+    const handleGoogleSignIn = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            navigate('/Dashboard');
         } catch (error) {
             setError(error.message);
             console.error(error);
@@ -32,7 +50,7 @@ const LoginPage = () => {
                 <h1 className="logo">CHARGETRAILS</h1>
             </header>
             <main className="login-main">
-                <h2 className="login-title">Sign in to your Account</h2>
+                <h2 className="login-title">Welcome Back!</h2>
                 <form className="login-form" onSubmit={handleLogin}>
                     <input
                         type="email"
@@ -50,13 +68,16 @@ const LoginPage = () => {
                         className="input-field"
                         required
                     />
-                    <button type="submit" className="signin-btn">Sign In</button>
+                    <button type="submit" className="signin-btn">Log In</button>
                 </form>
                 {error && <p className="error-message">{error}</p>}
                 <p className="continue-with-text">or continue with</p>
-                <button className="google-signin-btn">
+                <button className="google-signin-btn" onClick={handleGoogleSignIn}>
                     <img src={GoogleLogo} alt="Google Sign-In" className="google-logo" />
                 </button>
+                <p className="signup-link">
+                    Don't have an account? <a href="/Register">Sign up</a>
+                </p>
             </main>
         </div>
     );

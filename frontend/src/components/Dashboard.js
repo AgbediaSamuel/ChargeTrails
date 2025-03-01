@@ -2,17 +2,25 @@ import React from 'react';
 import '../Dashboard.css';
 // import SettingsIcon from '../assets/images/SettingsIcon.png';
 // import SearchIcon from '../assets/images/SearchIcon.png';
+// import { NewLog } from './NewLog';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage = () => {
+    const navigate = useNavigate();
+
+    const handleNewLogClick = () => {
+        navigate('/NewLog');
+    };
+
     return (
         <div>
             <div>
             <header className="header">
                 <h1 className="logo">CHARGETRAILS</h1>
                 <div className="header-icons">
-                    <button className="new-log-btn">New Log</button>
+                    <button className="new-log-btn" onClick={handleNewLogClick}>New Log</button>
                     <button className="settings-icon">
-                        <i class="fa-solid fa-gear"></i>
+                        <i className="fa-solid fa-gear"></i>
                     </button>
                 </div>
             </header>
@@ -23,7 +31,7 @@ const DashboardPage = () => {
                 <div className="search-bar-container">
                     <input type="text" placeholder="Search..." className="search-bar" />
                     <button className="search-button">
-                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <i className="fa-solid fa-magnifying-glass"></i>
                     </button>
                 </div>
                 <div className="product-list">

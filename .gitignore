@@ -1,11 +1,54 @@
+# Environment variables
 .env
 **/.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Old Files/No longer in use (for reference)
+backend/database.py
+backend/models.py
+backend/testdb.py
+frontend/src/App.test.js
+base64script.js
+backend/receipt_testing.jpeg
+backend/PHOTO-2024-12-24-10-37-18.jpg
+backend/requirements.txt
+
+# Firebase
 firebase.js
+*firebase-adminsdk*.json
+charge-trails-firebase-adminsdk*.json
+
+# Node modules
 frontend/node_modules/*
-temp.js
-frontend/node_modules/*
-backend/config/*
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python cache
 **/__pycache__/*
+*.py[cod]
+*$py.class
+
+# Project specific
+temp.js
+backend/config/*
 config/*
 trails/*
 chargeTrails/*
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
