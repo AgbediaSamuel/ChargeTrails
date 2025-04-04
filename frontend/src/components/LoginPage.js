@@ -13,13 +13,11 @@ const LoginPage = () => {
     const auth = getAuth();
     const { currentUser } = useAuth();
 
-    // Move the navigation logic to useEffect
     useEffect(() => {
-        // Redirect if user is already logged in
         if (currentUser) {
             navigate('/Dashboard');
         }
-    }, [currentUser, navigate]); // Add dependencies
+    }, [currentUser, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();

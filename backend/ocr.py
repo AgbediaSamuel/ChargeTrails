@@ -1,10 +1,11 @@
 import base64
 import requests
 import os
-import uuid
 import json
+import hashlib
 import time
 from decimal import Decimal
+from datetime import datetime
 import boto3
 import uvicorn
 from dotenv import load_dotenv
@@ -15,19 +16,16 @@ from auth import get_current_user, UserData
 load_dotenv()
 app = FastAPI()
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Update this to match your frontend URL
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# OpenAI API Key
 api_key = os.getenv("OPENAI_API_KEY")
 
-# DynamoDB setup
 access_key = os.getenv('AWS_ACCESS_KEY_ID')
 secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2', 
@@ -35,31 +33,26 @@ dynamodb = boto3.resource('dynamodb', region_name='us-west-2',
                          aws_secret_access_key=secret_key)
 receipt_table = dynamodb.Table('receipts')
 
-# Function to encode the image
 @app.post("/encode_image")
 async def encode_image_upload(
     file: UploadFile = File(...),
     current_user: UserData = Depends(get_current_user)
 ):
     try:
-        # Read the file contents
         file_content = await file.read()
-        
-        # Encode the file to Base64
         encoded_string = base64.b64encode(file_content).decode('utf-8')
-        
-        # Call the function to get receipt text
         result = get_receipt_text(encoded_string)
+        storing_response, duplicate_check = store_receipt_in_dynamo(result, current_user.email)
         
-        # Store the receipt in DynamoDB
-        receipt_id = store_receipt_in_dynamo(result, current_user.email)
-        
-        # Return the processed result along with the receipt ID
-        return {"receipt_id": receipt_id, "receipt_data": result}
+        if duplicate_check:
+            return {"message": "Receipt already exists!"}
+        elif storing_response and storing_response['ResponseMetadata']['HTTPStatusCode'] == 200:
+            return {"message": "Receipt stored successfully"}
+        else:
+            return {"message": "Failed to store receipt"}
     except Exception as e:
         return {"error": str(e)}
 
-# Function to get the text from the receipt
 def get_receipt_text(b64_image):
     headers = {
         "Content-Type": "application/json",
@@ -93,33 +86,30 @@ def get_receipt_text(b64_image):
         response.raise_for_status()
         result = response.json()['choices'][0]['message']['content']
         
-        # Convert the string result to structured data
-        # This assumes GPT returns a valid JSON string or dictionary-like format
-        # You might need to adjust this based on actual response format
         try:
-            # Try to parse as JSON if it's a string
             if isinstance(result, str):
                 parsed_result = json.loads(result)
             else:
                 parsed_result = result
             return parsed_result
         except json.JSONDecodeError:
-            # If parsing fails, return the raw text
             return {"raw_text": result}
     
     except Exception as e:
         return {"error": f"Error calling OpenAI API: {str(e)}"}
 
+def generate_receipt_id(*args):
+    parameters = [str(arg).strip().lower() for arg in args if arg is not None]
+    fingerprint = ('|').join(sorted(parameters))
+    receipt_id = hashlib.sha256(fingerprint.encode('utf-8')).hexdigest()[:16]
+    return receipt_id
+
+
 def store_receipt_in_dynamo(receipt_data, user_email):
     try:
-        # Generate a unique ID for this receipt
-        receipt_id = str(uuid.uuid4())
-        
-        # Extract the relevant data
         products = receipt_data.get("products", [])
         metadata = receipt_data.get("metadata", {})
         
-        # Convert float values to Decimal for DynamoDB
         for product in products:
             if "Price" in product:
                 product["Price"] = Decimal(str(product["Price"]))
@@ -128,27 +118,65 @@ def store_receipt_in_dynamo(receipt_data, user_email):
         if isinstance(total_amount, (int, float)):
             total_amount = Decimal(str(total_amount))
         
-        # Format date if needed (assuming date is in format MM/DD/YYYY)
         purchase_date = metadata.get("date of purchase", "")
+        if not purchase_date:  
+            purchase_date = datetime.now().strftime("%Y-%m-%d")
+
+        shop_name = metadata.get("shop name", "")
+        location = metadata.get("location", "")
+        receipt_id = generate_receipt_id(shop_name, location, total_amount, purchase_date, user_email)
         
-        # Store in DynamoDB
-        receipt_table.put_item(
-            Item={
-                'user_email': user_email,
-                'receipt_id': receipt_id,
-                'date': purchase_date,
-                'shop_name': metadata.get("shop name", ""),
-                'location': metadata.get("location", ""),
-                'total_amount': total_amount,
-                'products': products,
-                'timestamp': Decimal(str(int(time.time())))  # Add current timestamp
-            }
-        )
-        
-        return receipt_id
+        try: 
+            response = receipt_table.put_item(
+                Item={
+                    'user_email': user_email,
+                    'receipt_id': receipt_id,
+                    'date': purchase_date,
+                    'shop_name': shop_name,
+                    'location': location,
+                    'total_amount': total_amount,
+                    'products': products,
+                    'timestamp': Decimal(str(int(time.time())))
+                },
+                ConditionExpression ='attribute_not_exists(receipt_id)'
+            )
+            
+            return (response, False)
+        except dynamodb.meta.client.exceptions.ConditionalCheckFailedException:
+            response = None
+            return (response, True)
     except Exception as e:
         print(f"Error storing receipt in DynamoDB: {str(e)}")
         raise
+
+@app.get('/retrieve_receipts')
+def retrieve(
+    current_user: UserData = Depends(get_current_user)
+):
+    try:
+        response = receipt_table.query(
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('user_email').eq(current_user.email),
+            ScanIndexForward = False,
+            Limit = 5
+        )    
+
+        items = response.get('Items', [])
+
+        for item in items:
+            if 'total_amount' in item:
+                item['total_amount'] = float(item['total_amount'])
+            if 'products' in item:
+                for product in item['products']:
+                    if 'Price' in product:
+                        product['Price'] = float(product['Price'])
+            if 'timestamp' in item:
+                item['timestamp'] = float(item['timestamp'])
+                
+        return {"receipts": items}
+        
+    except Exception as e:
+        return {"error": str(e)}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)

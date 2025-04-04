@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background-color: #1a111f; /* Dark purple background */
+    background-color: #1a111f; 
     color: white;
   }
   
@@ -23,7 +23,7 @@ body {
   .logo {
     font-size: 16px;
     font-weight: bold;
-    color: #FFFFFF; /* White color for the logo text */
+    color: #FFFFFF;
   }
   
   .register-main {
@@ -64,7 +64,7 @@ body {
     font-size: 18px;
     font-weight: bold;
     color: white;
-    background-color: #4CAF50; /* Green color for the button */
+    background-color: #4CAF50; 
     border: none;
     border-radius: 20px;
     cursor: pointer;
@@ -89,7 +89,7 @@ body {
   }
   
   .google-logo {
-    width: 50px; /* You can adjust this based on your design */
+    width: 50px; 
     height: 50px;
   }
 

@@ -8,16 +8,13 @@ load_dotenv()
 access_key = os.getenv('AWS_ACCESS_KEY_ID')
 secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
 
-# Create a DynamoDB client
 dynamodb = boto3.resource('dynamodb', region_name='us-west-2', aws_access_key_id=access_key, aws_secret_access_key=secret_key)
 
-# Check if the table already exists
 existing_tables = list(dynamodb.tables.all())
 table_names = [table.name for table in existing_tables]
 
 if 'receipts' not in table_names:
     print("Creating 'receipts' table...")
-    # Create a table with improved schema
     table = dynamodb.create_table(
         TableName='receipts',
         KeySchema=[
@@ -72,7 +69,6 @@ if 'receipts' not in table_names:
         }
     )
     
-    # Wait for the table to be created
     print("Waiting for table creation...")
     waiter = boto3.client('dynamodb', region_name='us-west-2', 
                          aws_access_key_id=access_key, 

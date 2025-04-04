@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import '../Register.css'; 
 import GoogleLogo from '../assets/images/GoogleLogo.png';
 import { useAuth } from '../context/AuthContext';
@@ -15,20 +15,22 @@ const RegisterPage = () => {
     const auth = getAuth();
     const { currentUser } = useAuth();
 
-    // Move the navigation logic to useEffect
     useEffect(() => {
-        // Redirect if user is already logged in
         if (currentUser) {
             navigate('/Dashboard');
         }
-    }, [currentUser, navigate]); // Add dependencies
+    }, [currentUser, navigate]); 
 
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
             setError(null);
-            await createUserWithEmailAndPassword(auth, email, password);
-            // User is automatically signed in after registration
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            await updateProfile(user,
+                {displayName: firstName}
+            );
+
             navigate('/Dashboard');
         } catch (error) {
             setError(error.message);
