@@ -78,7 +78,6 @@ def get_receipt_text(b64_image):
                 ]
             }
         ],
-        "max_tokens": 300
     }
 
     try:
@@ -177,6 +176,27 @@ def retrieve(
     except Exception as e:
         return {"error": str(e)}
 
+@app.get("/user_products")
+def get_user_products(
+    current_user: UserData = Depends(get_current_user)
+):
+    try:
+        response = receipt_table.query(
+            KeyConditionExpression=boto3.dynamodb.conditions.Key('user_email').eq(current_user.email)
+        )
+        items = response.get('Items', [])
+
+        product_names = set()
+        for item in items:
+            for product in item.get('products', []):
+                name = product.get('Name')
+                if name:
+                    product_names.add(name)
+
+        return {"products": sorted(product_names, key=lambda x: x.lower())}
+    except Exception as e:
+        print(f"Error retrieving user products: {str(e)}")
+        return {"error": "Could not retrieve product names"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="localhost", port=8000)

@@ -38,6 +38,7 @@ backend/config/*
 config/*
 trails/*
 chargeTrails/*
+frontend/src/components/testSearch.js
 
 # OS specific
 .DS_Store

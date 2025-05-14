@@ -4,10 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import { getIdToken } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
+import { useProducts } from '../context/ProductContext';
 
 const NewLog = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
+    const { setProducts } = useProducts();
     const [isLoading, setIsLoading] = useState(false);
     const [responseData, setResponseData] = useState(null);
     const [error, setError] = useState(null);
@@ -96,6 +98,16 @@ const NewLog = () => {
             
             const data = await response.json();
             setResponseData(data);
+
+            const productsRes = await fetch("http://localhost:8000/user_products", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const productsData = await productsRes.json();
+            if (productsRes.ok && productsData.products) {
+                setProducts(productsData.products);
+                localStorage.setItem("products", JSON.stringify(productsData.products));
+            }
+
         } catch (error) {
             console.error('Upload error:', error);
             setError(error.message || 'Error uploading file');

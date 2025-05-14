@@ -77,3 +77,5 @@ if 'receipts' not in table_names:
     print("Table 'receipts' created successfully with new schema.")
 else:
     print("Table 'receipts' already exists.")
+
+

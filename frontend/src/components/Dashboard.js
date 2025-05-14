@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signOut } from 'firebase/auth';
+import { useProductSearch } from './SearchBar';
+import { useProducts } from '../context/ProductContext';
 
 const DashboardPage = () => {
     const navigate = useNavigate();
@@ -11,6 +13,10 @@ const DashboardPage = () => {
     const [receipts, setReceipts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const searchResults = useProductSearch(searchQuery);
+    const { clearProducts } = useProducts();
 
     useEffect(() => {
         const fetchReceipts = async () => {
@@ -47,6 +53,7 @@ const DashboardPage = () => {
 
     const handleSignout = async () => {
         try {
+            clearProducts(); 
             await signOut(auth);
             navigate('/');
         } catch (error) {
@@ -91,11 +98,27 @@ const DashboardPage = () => {
                 <main className="dashboard-main">
                     <h2 className="welcome-text">Welcome {user?.displayName || 'User'}</h2>
                     <div className="search-bar-container">
-                        <input type="text" placeholder="Search..." className="search-bar" />
+                        <input
+                            type="text"
+                            placeholder="type product name here...."
+                            className="search-bar"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                        />
                         <button className="search-button">
                             <i className="fa-solid fa-magnifying-glass"></i>
                         </button>
                     </div>
+                    
+                    {searchResults.length > 0 && (
+                        <div className="search-results">
+                            <ul>
+                                {searchResults.map((name, idx) => (
+                                    <li key={idx}>{name}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                     
                     <h3 className="section-title">Your Recent Receipts</h3>
                     
