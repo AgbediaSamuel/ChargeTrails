@@ -5,10 +5,12 @@ import RegisterPage from './components/RegisterPage';
 import LoginPage from './components/LoginPage';
 import DashboardPage from './components/Dashboard';
 import NewLog from './components/NewLog';
+import ReceiptsList from './components/ReceiptsList';
+import ReceiptDetail from './components/ReceiptDetail';
+import SettingsPage from './components/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { ProductProvider } from './context/ProductContext';
-import TestSearch from './components/testSearch';
 import './App.css';
 
 function App() {
@@ -18,11 +20,6 @@ function App() {
                 <Router>
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
-                        <Route path="/testSearch" element={
-                            <ProtectedRoute>
-                                <TestSearch />
-                            </ProtectedRoute>
-                        } />
                         <Route path="/Register" element={<RegisterPage />} />
                         <Route path="/Login" element={<LoginPage />} />
                         <Route path="/Dashboard" element={
@@ -30,9 +27,24 @@ function App() {
                                 <DashboardPage />
                             </ProtectedRoute>
                         } />
+                        <Route path="/receipts" element={
+                            <ProtectedRoute>
+                                <ReceiptsList />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/receipts/:receiptId" element={
+                            <ProtectedRoute>
+                                <ReceiptDetail />
+                            </ProtectedRoute>
+                        } />
                         <Route path="/NewLog" element={
                             <ProtectedRoute>
                                 <NewLog />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/settings" element={
+                            <ProtectedRoute>
+                                <SettingsPage />
                             </ProtectedRoute>
                         } />
                     </Routes>

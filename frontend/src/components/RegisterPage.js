@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from 'firebase/auth';
 import '../Register.css'; 
-import GoogleLogo from '../assets/images/GoogleLogo.png';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
@@ -50,11 +49,11 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="register-container">
-            <header className="header">
+        <div className="register-container container">
+            <header className="header-bar">
                 <h1 className="logo">CHARGETRAILS</h1>
             </header>
-            <main className="register-main">
+            <main className="register-main card">
                 <h2 className="register-title">Create an Account</h2>
                 <form className="register-form" onSubmit={handleRegister}>
                     <input
@@ -62,7 +61,7 @@ const RegisterPage = () => {
                         placeholder="First Name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        className="input-field"
+                        className="input-field input"
                         required
                     />
                     <input
@@ -70,7 +69,7 @@ const RegisterPage = () => {
                         placeholder="Last Name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        className="input-field"
+                        className="input-field input"
                         required
                     />
                     <input
@@ -78,7 +77,7 @@ const RegisterPage = () => {
                         placeholder="Email Address"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="input-field"
+                        className="input-field input"
                         required
                     />
                     <input
@@ -86,15 +85,20 @@ const RegisterPage = () => {
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="input-field"
+                        className="input-field input"
                         required
                     />
-                    <button type="submit" className="create-account-btn">Create Account</button>
+                    <button type="submit" className="create-account-btn btn btn-primary">Create Account</button>
                 </form>
                 {error && <p className="error-message">{error}</p>}
                 <p className="continue-with-text">or continue with</p>
-                <button className="google-signin-btn" onClick={handleGoogleSignIn}>
-                    <img src={GoogleLogo} alt="Google Sign-In" className="google-logo" />
+                <button className="google-signin-btn btn btn-accent" onClick={handleGoogleSignIn}>
+                    <svg width="22" height="22" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path fill="#4285F4" d="M533.5 278.4c0-18.6-1.7-37-5.2-54.8H272v103.8h147.4c-6.3 34.1-25.3 63-54 82.4v68h87.2c51-47 80.9-116.2 80.9-199.4z"/>
+                        <path fill="#34A853" d="M272 544.3c72.9 0 134.1-24.1 178.8-65.5l-87.2-68c-24.2 16.3-55.1 25.8-91.6 25.8-70.5 0-130.2-47.6-151.6-111.4H29.1v69.9C73.5 492.2 167.7 544.3 272 544.3z"/>
+                        <path fill="#FBBC05" d="M120.4 325.2c-10.7-31.9-10.7-66.5 0-98.4V156.9H29.1c-38.9 77.8-38.9 169.9 0 247.7l91.3-69.4z"/>
+                        <path fill="#EA4335" d="M272 107.7c39.6-.6 77.8 14.5 106.9 42.6l80.1-80.1C402.6 24.2 339.4-.1 272 0 167.7 0 73.5 52.1 29.1 156.9l91.3 69.9C141.8 163.1 201.5 115.5 272 115.5z"/>
+                    </svg>
                 </button>
             </main>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../Dashboard.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getAuth, signOut } from 'firebase/auth';
 import { useProductSearch } from './SearchBar';
 import { useProducts } from '../context/ProductContext';
@@ -41,7 +41,7 @@ const DashboardPage = () => {
                 const data = await response.json();
                 setReceipts(data.receipts || []);
             } catch (err) {
-                console.error('Error fetching receipts:', err);
+
                 setError('Could not load your receipts. Please try again later.');
             } finally {
                 setIsLoading(false);
@@ -57,7 +57,7 @@ const DashboardPage = () => {
             await signOut(auth);
             navigate('/');
         } catch (error) {
-            alert("There's an error with signing out!", error);
+            alert("There's an error with signing out!");
         }
     };
 
@@ -82,17 +82,17 @@ const DashboardPage = () => {
 
     return (
         <div>
-            <div>
-                <header className="header">
-                    <h1 className="logo">CHARGETRAILS</h1>
-                    <div className="header-icons">
-                        <button className="new-log-btn" onClick={handleNewLogClick}>New Log</button>
-                        <button className="new-log-btn" onClick={handleSignout}> Sign Out</button>
-                        <button className="settings-icon">
-                            <i className="fa-solid fa-gear"></i>
-                        </button>
-                    </div>
-                </header>
+            <div className="header">
+                <h1 className="logo">CHARGETRAILS</h1>
+                <div className="header-icons">
+                    <Link to="/NewLog" className="new-log-btn" style={{display:'inline-block', textDecoration:'none', textAlign:'center'}}>
+                        New Log
+                    </Link>
+                    <button className="new-log-btn" onClick={handleSignout}> Sign Out</button>
+                    <button className="settings-icon" onClick={() => navigate('/settings')}>
+                        <i className="fa-solid fa-gear"></i>
+                    </button>
+                </div>
             </div>
             <div className="dashboard-container">
                 <main className="dashboard-main">
@@ -144,9 +144,10 @@ const DashboardPage = () => {
                     {!isLoading && !error && receipts.length > 0 && (
                         <div className="product-list">
                             {receipts.slice(0, 5).map((receipt) => (
-                                <button 
-                                    key={receipt.receipt_id} 
+                                <button
+                                    key={receipt.receipt_id}
                                     className="product-item"
+                                    onClick={() => navigate(`/receipts/${receipt.receipt_id}`, { state: { receipt } })}
                                 >
                                     Receipt saved on {formatDate(receipt.date)}
                                     {receipt.shop_name && <span className="receipt-shop"> from {receipt.shop_name}</span>}
@@ -155,9 +156,9 @@ const DashboardPage = () => {
                         </div>
                     )}
                     
-                    {!isLoading && !error && receipts.length > 5 && (
+                    {!isLoading && !error && receipts.length > 0 && (
                         <button className="view-all-btn" onClick={() => navigate('/receipts')}>
-                            View All ({receipts.length})
+                            View All
                         </button>
                     )}
                 </main>

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
+import { authFetch } from "../apiClient";
+import { hydrateProducts, saveProducts, clearProductsCache } from "../cache/productsCache";
 
 const ProductContext = createContext();
 
@@ -8,33 +10,30 @@ export function ProductProvider({ children }) {
 
   useEffect(() => {
     const auth = getAuth();
-    const fetchProducts = async () => {
-      const cached = localStorage.getItem("products");
-      if (cached) {
-        setProducts(JSON.parse(cached));
-        return;
-      }
-      if (!auth.currentUser) return;
+    const user = auth.currentUser;
+    if (!user) return;
+    const cached = hydrateProducts(user.uid);
+    if (cached.length) setProducts(cached);
+
+    (async () => {
       try {
-        const token = await auth.currentUser.getIdToken(true);
-        const res = await fetch("http://localhost:8000/user_products", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await authFetch("/user_products");
         const data = await res.json();
         if (res.ok && data.products) {
           setProducts(data.products);
-          localStorage.setItem("products", JSON.stringify(data.products));
+          saveProducts(user.uid, data.products);
         }
       } catch {
-        setProducts([]);
+        // ignore
       }
-    };
-    fetchProducts();
+    })();
   }, []);
 
   const clearProducts = () => {
     setProducts([]);
-    localStorage.removeItem("products");
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) clearProductsCache(user.uid);
   };
 
   return (

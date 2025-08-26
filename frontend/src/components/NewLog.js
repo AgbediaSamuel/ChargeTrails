@@ -2,9 +2,12 @@ import React, { useState, useRef } from 'react';
 import '../NewLog.css';
 import { useAuth } from '../context/AuthContext';
 import { getIdToken } from 'firebase/auth';
+import { authFetch } from '../apiClient';
 import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import { useProducts } from '../context/ProductContext';
+import { mergeOneIntoCache } from '../cache/receiptsCache';
+import { saveProducts } from '../cache/productsCache';
 
 const NewLog = () => {
     const navigate = useNavigate();
@@ -81,13 +84,8 @@ const NewLog = () => {
             const formData = new FormData();
             formData.append("file", file);
             
-            const token = await getIdToken(currentUser, true);
-            
-            const response = await fetch("http://localhost:8000/encode_image", {
+            const response = await authFetch("/encode_image", {
                 method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                },
                 body: formData,
             });
             
@@ -99,14 +97,25 @@ const NewLog = () => {
             const data = await response.json();
             setResponseData(data);
 
-            const productsRes = await fetch("http://localhost:8000/user_products", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
+            const productsRes = await authFetch("/user_products");
             const productsData = await productsRes.json();
             if (productsRes.ok && productsData.products) {
                 setProducts(productsData.products);
-                localStorage.setItem("products", JSON.stringify(productsData.products));
+                if (currentUser) saveProducts(currentUser.uid, productsData.products);
             }
+
+            try {
+                const auth = getIdToken;
+                const newReceiptRes = await authFetch(`/receipts?limit=1`);
+                const latest = await newReceiptRes.json();
+                if (newReceiptRes.ok && Array.isArray(latest.receipts) && latest.receipts.length > 0) {
+                    const r = latest.receipts[0];
+                    if (r && currentUser) {
+                        if (r.timestamp == null) r.timestamp = Date.now();
+                        mergeOneIntoCache(currentUser.uid, r);
+                    }
+                }
+            } catch {}
 
         } catch (error) {
             console.error('Upload error:', error);

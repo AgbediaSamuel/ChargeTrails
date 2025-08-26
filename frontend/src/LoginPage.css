@@ -1,30 +1,11 @@
 
-body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #1a111f;
-    color: white;
-}
-
 .login-container {
     display: flex;
     flex-direction: column;
     height: 100vh;
     justify-content: center;
-    align-items: flex-start;
-    padding-left: 50px;
-}
-
-.header {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-}
-
-.logo {
-    font-size: 16px;
-    font-weight: bold;
-    color: #FFFFFF; 
+    align-items: center;
+    padding: 24px;
 }
 
 .login-main {
@@ -32,6 +13,11 @@ body {
     flex-direction: column;
     max-width: 400px;
     width: 100%;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    background: var(--surface);
+    padding: 24px;
 }
 
 .login-title {
@@ -47,28 +33,12 @@ body {
 .input-field {
     padding: 10px 0;
     margin-bottom: 20px;
-    background-color: transparent;
-    border: none;
-    border-bottom: 2px solid #FFFFFF;
-    color: white;
     font-size: 16px;
 }
 
-.input-field::placeholder {
-    color: white;
-    opacity: 0.7;
-}
-
 .signin-btn {
-    padding: 15px 30px;
+    padding: 12px 18px;
     margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    background-color: #4CAF50; 
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
     width: 100%;
 }
 

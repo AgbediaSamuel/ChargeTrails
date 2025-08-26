@@ -5,7 +5,6 @@ export function useProductSearch(query) {
 
   if (!query) return [];
 
-  // Filter and sort by first match position
   return products
     .filter((name) => name.toLowerCase().includes(query.toLowerCase()))
     .sort((a, b) => {
